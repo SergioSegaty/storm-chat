@@ -17,6 +17,7 @@ on:
             - 'packages/shared/**'
             - 'pnpm-workspace.yaml'
             - 'pnpm-lock.yaml'
+            - '.github/workflows/frontend.yml'
 
 jobs: 
     test-and-build:

@@ -17,7 +17,7 @@ on:
             - 'packages/shared/**'
             - 'pnpm-workspace.yaml'
             - 'pnpm-lock.yaml'
-
+            - '.github/workflows/server.yml'
 jobs: 
     test-and-build:
         runs-on: ubuntu-latest
