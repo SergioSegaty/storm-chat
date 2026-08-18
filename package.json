@@ -1,0 +1,32 @@
+{
+  "name": "storm-chat",
+  "version": "0.0.1",
+  "description": "Simple RAG Chat - AI Engineering Study",
+  "private": true,
+  "scripts": {
+    "dev:backend": "pnpm --filter backend dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "build": "pnpm --filter shared build && pnpm -r --filter=!shared build",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test"
+  },
+  "keywords": [
+    "RAG",
+    "AI",
+    "artificial",
+    "inteligence",
+    "chatbot",
+    "ai-chatbot"
+  ],
+  "author": "Sérgio Segaty",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.22.0",
+      "onFail": "download"
+    }
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}
