@@ -1,0 +1,57 @@
+name: Server CI
+
+on:
+    push:
+        branches: [main] 
+        paths: 
+            - 'packages/server/**'
+            - 'packages/shared/**'
+            - 'pnpm-workspace.yaml'
+            - 'pnpm-lock.yaml'
+            - '.github/workflows/server.yml'
+        
+    pull_request:
+        branches: [main]
+        paths: 
+            - 'packages/server/**'
+            - 'packages/shared/**'
+            - 'pnpm-workspace.yaml'
+            - 'pnpm-lock.yaml'
+
+jobs: 
+    test-and-build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with: 
+                version: 11.22.0
+
+            - name: Setup node
+              uses: actions/setup-node@v4
+              with:
+                node-version: 22
+                cache: pnpm
+                
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build shared
+              run: pnpm --filter shared build
+
+            - name: Lint
+              run: pnpm --filter server lint
+
+            - name: Test
+              run: pnpm --filter server test
+              env:
+                ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+                VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+                SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+                SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+            - name: Build Backend
+              run: pnpm --filter server build

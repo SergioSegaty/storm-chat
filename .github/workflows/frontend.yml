@@ -1,0 +1,52 @@
+name: Frontend CI
+
+on:
+    push:
+        branches: [main] 
+        paths: 
+            - 'packages/frontend/**'
+            - 'packages/shared/**'
+            - 'pnpm-workspace.yaml'
+            - 'pnpm-lock.yaml'
+            - '.github/workflows/frontend.yml'
+        
+    pull_request:
+        branches: [main]
+        paths: 
+            - 'packages/frontend/**'
+            - 'packages/shared/**'
+            - 'pnpm-workspace.yaml'
+            - 'pnpm-lock.yaml'
+
+jobs: 
+    test-and-build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with: 
+                version: 11.22.0
+
+            - name: Setup node
+              uses: actions/setup-node@v4
+              with:
+                node-version: 22
+                cache: pnpm
+                
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build shared
+              run: pnpm --filter shared build
+
+            - name: Lint
+              run: pnpm --filter frontend lint
+
+            - name: Test
+              run: pnpm --filter frontend test
+
+            - name: Build Backend
+              run: pnpm --filter frontend build
