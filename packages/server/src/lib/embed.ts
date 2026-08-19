@@ -5,11 +5,13 @@ const voyage = new VoyageAIClient({ apiKey: env.VOYAGE_API_KEY });
 
 export async function embedTexts(
 	texts: string[],
+	inputType: 'document' | 'query' = 'document',
 ): Promise<number[][]> {
 	const res = await voyage.embed({
 		input: texts,
 		model: 'voyage-4-lite',
-		inputType: 'document',
+		inputType,
+		outputDimension: 512,
 	});
 
 	const embeddings = res.data
