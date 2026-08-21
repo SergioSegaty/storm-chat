@@ -18,32 +18,32 @@ The RAG pipeline is broken into distinct layers, each with a single responsibili
 
 ```
                  ┌─────────────────────────────────────────────────────────┐
-                 │                  Frontend (Vercel)                        │
-                 │        Chat UI · streams Claude's response token by      │
-                 │           token via the Vercel AI SDK's useChat          │
+                 │                  Frontend (Vercel)                      │
+                 │        Chat UI · streams Claude's response token by     │
+                 │           token via the Vercel AI SDK's useChat         │
                  └───────────────────────────┬─────────────────────────────┘
-                                              │
+                                             │
                  ┌───────────────────────────▼─────────────────────────────┐
-                 │                  Backend (Render)                         │
-                 │        API routes · orchestrates retrieval + Claude      │
+                 │                  Backend (Render)                       │
+                 │        API routes · orchestrates retrieval + Claude     │
+                 └─────────────────────────────┬───────────────────────────┘
+                                               │
+                ┌──────────────┬───────────────▼──────────────┬───────────┐
+                │  1. Ingestion │ 2. Chunking  │ 3. Embedding │ 4. Vector │
+                │     Layer     │    Layer     │    Layer     │   Store   │
+                │  parses PDF   │  splits docs │  Voyage AI   │  Supabase │
+                │  and MD files │  into chunks │  embeddings  │  pgvector │
+                └───────────────┴──────────────┴──────────────┴─────┬─────┘
+                                                                    │
+                 ┌──────────────────────────────────────────────────▼──────┐
+                 │                     5. Retrieval Layer                  │
+                 │      similarity search → relevant chunks as context     │
                  └───────────────────────────┬─────────────────────────────┘
-                                              │
-        ┌──────────────┬──────────────┬──────▼───────┬──────────────┐
-        │  1. Ingestion │ 2. Chunking  │ 3. Embedding │ 4. Vector    │
-        │     Layer     │    Layer     │    Layer     │   Store      │
-        │  parses PDF   │  splits docs │  Voyage AI   │  Supabase    │
-        │  and MD files │  into chunks │  embeddings  │  pgvector    │
-        └──────────────┴──────────────┴──────────────┴──────┬───────┘
-                                                              │
-                 ┌───────────────────────────────────────────▼─────────────┐
-                 │                     5. Retrieval Layer                   │
-                 │      similarity search → relevant chunks as context      │
-                 └───────────────────────────┬───────────────────────────-─┘
-                                              │
+                                             │
                  ┌───────────────────────────▼─────────────────────────────┐
-                 │                       Claude API                         │
+                 │                       Claude API                        │
                  │      context + user question → streamed response        │
-                 └────────────────────────────────────────────────────────-┘
+                 └─────────────────────────────────────────────────────────┘
 ```
 
 ### Layers
