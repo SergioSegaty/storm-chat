@@ -1,28 +1,28 @@
-import { UIMessage } from 'ai';
+import { safeValidateUIMessages, UIMessage } from 'ai';
 import z from 'zod';
+
+const metadataSchema = z.object({
+	timestamp: z.iso.datetime(),
+});
+
+const dataSchemas = {};
 
 export const chatRequestSchema = z.object({
 	messages: z
-		.array(
-			z.object({
-				role: z.enum(['user', 'assistant']),
-				content: z.string(),
-				id: z.string(),
-				parts: z.array(
-					z.object({
-						type: z.string(),
-						text: z.string(),
-					}),
-				),
-			}),
-		)
-		.min(1),
-});
+		.array(z.unknown())
+		.min(1)
+		.transform(async (messages, ctx): Promise<UIMessage[]> => {
+			const result = await safeValidateUIMessages<UIMessage>({
+				messages,
+				metadataSchema,
+				dataSchemas,
+			});
 
-export const partSchema = z.object({
-	type: z.string(),
-	text: z.string(),
-});
+			if (!result.success) {
+				ctx.addIssue(result.error.message);
+				return z.NEVER;
+			}
 
-type CustomParts = z.infer<typeof partSchema>;
-export type ChatUiMessage = UIMessage<never, CustomParts, never>;
+			return result.data;
+		}),
+});

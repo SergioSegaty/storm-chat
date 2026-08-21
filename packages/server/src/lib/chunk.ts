@@ -1,3 +1,5 @@
+import { RetrievedChunk } from './search';
+
 interface Chunk {
 	text: string;
 	metadata: Record<string, unknown>;
@@ -25,4 +27,13 @@ export function chunkText(
 	}
 
 	return chunks;
+}
+
+export function flatRetrievedChunk(chunks: RetrievedChunk[]): string {
+	return chunks
+		.map(
+			(chunk, i) =>
+				`[${i + 1}] (source: ${chunk.metadata.source ?? 'unknown'})\n${chunk.content}`,
+		)
+		.join('\n\n---\n\n');
 }

@@ -4,7 +4,6 @@ import {
 	pipeUIMessageStreamToResponse,
 	streamText,
 	toUIMessageStream,
-	UIMessage,
 } from 'ai';
 import { anthropic } from '@ai-sdk/anthropic';
 import {
@@ -12,15 +11,15 @@ import {
 	AppError,
 } from '#server/middleware/error-handler';
 import { searchChunks } from '#server/lib/search';
-import { chatRequestSchema, ChatUiMessage } from 'shared';
+import { chatRequestSchema } from 'shared';
+import { flatRetrievedChunk } from '#server/lib/chunk';
 
 export const chatRouter: Router = Router();
 
 chatRouter.post(
 	'/',
 	asyncHandler(async (req, res) => {
-		const { messages } = chatRequestSchema.parse(req.body);
-		// const body: { messages: ChatUiMessage[] } = req.body;
+		const { messages } = await chatRequestSchema.parseAsync(req.body);
 		const lastMessage = messages.at(-1);
 
 		if (!lastMessage || lastMessage.role !== 'user') {
@@ -35,26 +34,19 @@ chatRouter.post(
 
 		const retrieved = await searchChunks(lastPart.text);
 
-		const context = retrieved
-			.map(
-				(chunk, i) =>
-					`[${i + 1}] (source: ${chunk.metadata.source ?? 'unknown'})\n${chunk.content}`,
-			)
-			.join('\n\n---\n\n');
+		const context = flatRetrievedChunk(retrieved);
 
 		const result = streamText({
 			model: anthropic('claude-sonnet-4-6'),
 			system: `You answer questions using only the provided context below. If the answer isn't in the context, say you dont know - don't make anything up \n\nContext:\n${context || '(no relevant context found)'}`,
-			messages: await convertToModelMessages(
-				messages as ChatUiMessage[],
-			),
+			messages: await convertToModelMessages(messages),
 		});
 
 		await pipeUIMessageStreamToResponse({
 			response: res,
 			stream: toUIMessageStream({
 				stream: result.stream,
-				originalMessages: messages as ChatUiMessage[],
+				originalMessages: messages,
 			}),
 		});
 	}),
