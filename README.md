@@ -26,9 +26,10 @@ The RAG pipeline is broken into distinct layers, each with a single responsibili
                  ┌───────────────────────────▼─────────────────────────────┐
                  │                  Backend (Render)                       │
                  │        API routes · orchestrates retrieval + Claude     │
-                 └─────────────────────────────┬───────────────────────────┘
-                                               │
-                ┌──────────────┬───────────────▼──────────────┬───────────┐
+                 │               Persist & retrieve Chat Data              │
+                 └───┬─────────────────────────────────────────────────────┘
+                     │
+                ┌────▼──────────┬─────────────────────────────┬───────────┐
                 │  1. Ingestion │ 2. Chunking  │ 3. Embedding │ 4. Vector │
                 │     Layer     │    Layer     │    Layer     │   Store   │
                 │  parses PDF   │  splits docs │  Voyage AI   │  Supabase │
@@ -99,6 +100,15 @@ Deployment: Vercel deploys the `frontend` package directly from the repo; Render
 ## Status
 
 🚧 Early scaffolding. The monorepo layout (`server`, `frontend`, `shared`) and CI workflows exist; the ingestion → chunking → embedding → vector store → retrieval pipeline and the Claude streaming integration are being built out layer by layer.
+
+The Database is on Supabase, all the migrations are inside supabase folder.
+
+### Currently working on setting up Routes and API Services to:
+
+- Persist and Retrieve Messages and Message parts
+- Creating Unit Tests for the Server
+
+### I plan to work on the Frontend next.
 
 ## Getting started
 
