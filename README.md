@@ -74,18 +74,18 @@ storm-chat/
 
 ## Tech stack
 
-| Concern | Choice |
-|---|---|
-| LLM | Claude API (Anthropic) |
-| Streaming / model calls | Vercel AI SDK |
-| Embeddings | Voyage AI |
-| Vector store | Supabase (Postgres + pgvector) |
-| Source formats | PDF, Markdown |
-| Frontend hosting | Vercel |
-| Backend hosting | Render (Docker) |
-| Monorepo | pnpm workspaces |
-| CI/CD | GitHub Actions |
-| Language | TypeScript |
+| Concern                 | Choice                         |
+| ----------------------- | ------------------------------ |
+| LLM                     | Claude API (Anthropic)         |
+| Streaming / model calls | Vercel AI SDK                  |
+| Embeddings              | Voyage AI                      |
+| Vector store            | Supabase (Postgres + pgvector) |
+| Source formats          | PDF, Markdown                  |
+| Frontend hosting        | Vercel                         |
+| Backend hosting         | Render (Docker)                |
+| Monorepo                | pnpm workspaces                |
+| CI/CD                   | GitHub Actions                 |
+| Language                | TypeScript                     |
 
 ## CI/CD
 
