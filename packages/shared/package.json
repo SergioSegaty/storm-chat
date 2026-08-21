@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "",
   "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "vitest run"
@@ -11,5 +15,9 @@
   "author": "Sérgio Segaty",
   "devDependencies": {
     "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "ai": "^7.0.66",
+    "zod": "^4.4.3"
   }
 }
