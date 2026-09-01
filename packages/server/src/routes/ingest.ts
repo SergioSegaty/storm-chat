@@ -5,6 +5,7 @@ import { chunkText } from '#server/lib/chunk';
 import { embedTexts } from '#server/lib/embed';
 import { supabase } from '#server/lib/supabase';
 import { parseDocument } from '../parsers';
+import { Json } from 'shared';
 
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -35,8 +36,8 @@ ingestRouter.post(
 
 			const rows = chunks.map((chunk, i) => ({
 				content: chunk.text,
-				metadata: chunk.metadata,
-				embedding: embeddings[i],
+				metadata: chunk.metadata as Json,
+				embedding: JSON.stringify(embeddings[i]),
 			}));
 
 			const { error } = await supabase.from('documents').insert(rows);

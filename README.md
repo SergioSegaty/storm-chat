@@ -18,32 +18,33 @@ The RAG pipeline is broken into distinct layers, each with a single responsibili
 
 ```
                  ┌─────────────────────────────────────────────────────────┐
-                 │                  Frontend (Vercel)                        │
-                 │        Chat UI · streams Claude's response token by      │
-                 │           token via the Vercel AI SDK's useChat          │
+                 │                  Frontend (Vercel)                      │
+                 │        Chat UI · streams Claude's response token by     │
+                 │           token via the Vercel AI SDK's useChat         │
                  └───────────────────────────┬─────────────────────────────┘
-                                              │
+                                             │
                  ┌───────────────────────────▼─────────────────────────────┐
-                 │                  Backend (Render)                         │
-                 │        API routes · orchestrates retrieval + Claude      │
+                 │                  Backend (Render)                       │
+                 │        API routes · orchestrates retrieval + Claude     │
+                 │               Persist & retrieve Chat Data              │
+                 └───┬─────────────────────────────────────────────────────┘
+                     │
+                ┌────▼──────────┬─────────────────────────────┬───────────┐
+                │  1. Ingestion │ 2. Chunking  │ 3. Embedding │ 4. Vector │
+                │     Layer     │    Layer     │    Layer     │   Store   │
+                │  parses PDF   │  splits docs │  Voyage AI   │  Supabase │
+                │  and MD files │  into chunks │  embeddings  │  pgvector │
+                └───────────────┴──────────────┴──────────────┴─────┬─────┘
+                                                                    │
+                 ┌──────────────────────────────────────────────────▼──────┐
+                 │                     5. Retrieval Layer                  │
+                 │      similarity search → relevant chunks as context     │
                  └───────────────────────────┬─────────────────────────────┘
-                                              │
-        ┌──────────────┬──────────────┬──────▼───────┬──────────────┐
-        │  1. Ingestion │ 2. Chunking  │ 3. Embedding │ 4. Vector    │
-        │     Layer     │    Layer     │    Layer     │   Store      │
-        │  parses PDF   │  splits docs │  Voyage AI   │  Supabase    │
-        │  and MD files │  into chunks │  embeddings  │  pgvector    │
-        └──────────────┴──────────────┴──────────────┴──────┬───────┘
-                                                              │
-                 ┌───────────────────────────────────────────▼─────────────┐
-                 │                     5. Retrieval Layer                   │
-                 │      similarity search → relevant chunks as context      │
-                 └───────────────────────────┬───────────────────────────-─┘
-                                              │
+                                             │
                  ┌───────────────────────────▼─────────────────────────────┐
-                 │                       Claude API                         │
+                 │                       Claude API                        │
                  │      context + user question → streamed response        │
-                 └────────────────────────────────────────────────────────-┘
+                 └─────────────────────────────────────────────────────────┘
 ```
 
 ### Layers
@@ -74,18 +75,18 @@ storm-chat/
 
 ## Tech stack
 
-| Concern | Choice |
-|---|---|
-| LLM | Claude API (Anthropic) |
-| Streaming / model calls | Vercel AI SDK |
-| Embeddings | Voyage AI |
-| Vector store | Supabase (Postgres + pgvector) |
-| Source formats | PDF, Markdown |
-| Frontend hosting | Vercel |
-| Backend hosting | Render (Docker) |
-| Monorepo | pnpm workspaces |
-| CI/CD | GitHub Actions |
-| Language | TypeScript |
+| Concern                 | Choice                         |
+| ----------------------- | ------------------------------ |
+| LLM                     | Claude API (Anthropic)         |
+| Streaming / model calls | Vercel AI SDK                  |
+| Embeddings              | Voyage AI                      |
+| Vector store            | Supabase (Postgres + pgvector) |
+| Source formats          | PDF, Markdown                  |
+| Frontend hosting        | Vercel                         |
+| Backend hosting         | Render (Docker)                |
+| Monorepo                | pnpm workspaces                |
+| CI/CD                   | GitHub Actions                 |
+| Language                | TypeScript                     |
 
 ## CI/CD
 
@@ -99,6 +100,15 @@ Deployment: Vercel deploys the `frontend` package directly from the repo; Render
 ## Status
 
 🚧 Early scaffolding. The monorepo layout (`server`, `frontend`, `shared`) and CI workflows exist; the ingestion → chunking → embedding → vector store → retrieval pipeline and the Claude streaming integration are being built out layer by layer.
+
+The Database is on Supabase, all the migrations are inside supabase folder.
+
+### Currently working on setting up Routes and API Services to:
+
+- Persist and Retrieve Messages and Message parts
+- Creating Unit Tests for the Server
+
+### I plan to work on the Frontend next.
 
 ## Getting started
 
